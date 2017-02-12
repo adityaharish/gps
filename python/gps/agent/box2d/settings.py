@@ -27,7 +27,7 @@ class fwSettings(object):
     backend = 'pygame'
 
     # Physics options
-    hz = 20.0
+    hz = 100.0
     velocityIterations = 8
     positionIterations = 3
     enableWarmStarting = True

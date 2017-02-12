@@ -92,7 +92,7 @@ class DynamicsPriorGMM(object):
         # Choose number of clusters.
         K = int(max(2, min(self._max_clusters,
                            np.floor(float(N * T) / self._min_samp))))
-        LOGGER.debug('Generating %d clusters for dynamics GMM.', K)
+        # LOGGER.debug('Generating %d clusters for dynamics GMM.', K)
 
         # Update GMM.
         self.gmm.update(xux, K)

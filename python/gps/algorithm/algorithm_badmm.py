@@ -317,10 +317,10 @@ class AlgorithmBADMM(Algorithm):
         prev_mc_kl_sum = np.sum(prev_mc_kl * pol_wt)
         new_mc_kl_sum = np.sum(new_mc_kl * pol_wt)
 
-        LOGGER.debug(
-            'Trajectory step: ent: %f cost: %f -> %f KL: %f -> %f',
-            ent, prev_mc_obj, new_mc_obj, prev_mc_kl_sum, new_mc_kl_sum
-        )
+#        LOGGER.debug(
+#           'Trajectory step: ent: %f cost: %f -> %f KL: %f -> %f',
+#            ent, prev_mc_obj, new_mc_obj, prev_mc_kl_sum, new_mc_kl_sum
+#        )
 
         # Compute predicted and actual improvement.
         predicted_impr = np.sum(prev_laplace_obj) + prev_laplace_kl_sum - \
@@ -329,26 +329,26 @@ class AlgorithmBADMM(Algorithm):
                 np.sum(new_actual_laplace_obj) - new_actual_laplace_kl_sum
 
         # Print improvement details.
-        LOGGER.debug('Previous cost: Laplace: %f MC: %f',
-                     np.sum(prev_laplace_obj), prev_mc_obj)
-        LOGGER.debug('Predicted new cost: Laplace: %f MC: %f',
-                     np.sum(new_pred_laplace_obj), new_mc_obj)
-        LOGGER.debug('Actual new cost: Laplace: %f MC: %f',
-                     np.sum(new_actual_laplace_obj), new_mc_obj)
-        LOGGER.debug('Previous KL: Laplace: %f MC: %f',
-                     np.sum(prev_laplace_kl), np.sum(prev_mc_kl))
-        LOGGER.debug('Predicted new KL: Laplace: %f MC: %f',
-                     np.sum(new_pred_laplace_kl), np.sum(new_mc_kl))
-        LOGGER.debug('Actual new KL: Laplace: %f MC: %f',
-                     np.sum(new_actual_laplace_kl), np.sum(new_mc_kl))
-        LOGGER.debug('Previous w KL: Laplace: %f MC: %f',
-                     prev_laplace_kl_sum, prev_mc_kl_sum)
-        LOGGER.debug('Predicted w new KL: Laplace: %f MC: %f',
-                     new_pred_laplace_kl_sum, new_mc_kl_sum)
-        LOGGER.debug('Actual w new KL: Laplace %f MC: %f',
-                     new_actual_laplace_kl_sum, new_mc_kl_sum)
-        LOGGER.debug('Predicted/actual improvement: %f / %f',
-                     predicted_impr, actual_impr)
+        #LOGGER.debug('Previous cost: Laplace: %f MC: %f',
+         #            np.sum(prev_laplace_obj), prev_mc_obj)
+        #LOGGER.debug('Predicted new cost: Laplace: %f MC: %f',
+         #            np.sum(new_pred_laplace_obj), new_mc_obj)
+        #LOGGER.debug('Actual new cost: Laplace: %f MC: %f',
+         #            np.sum(new_actual_laplace_obj), new_mc_obj)
+        #LOGGER.debug('Previous KL: Laplace: %f MC: %f',
+         #            np.sum(prev_laplace_kl), np.sum(prev_mc_kl))
+        #LOGGER.debug('Predicted new KL: Laplace: %f MC: %f',
+         #            np.sum(new_pred_laplace_kl), np.sum(new_mc_kl))
+        #LOGGER.debug('Actual new KL: Laplace: %f MC: %f',
+         #            np.sum(new_actual_laplace_kl), np.sum(new_mc_kl))
+        #LOGGER.debug('Previous w KL: Laplace: %f MC: %f',
+         #            prev_laplace_kl_sum, prev_mc_kl_sum)
+        #LOGGER.debug('Predicted w new KL: Laplace: %f MC: %f',
+         #            new_pred_laplace_kl_sum, new_mc_kl_sum)
+        #LOGGER.debug('Actual w new KL: Laplace %f MC: %f',
+         #            new_actual_laplace_kl_sum, new_mc_kl_sum)
+        #LOGGER.debug('Predicted/actual improvement: %f / %f',
+         #            predicted_impr, actual_impr)
 
         # Compute actual KL step taken at last iteration.
         actual_step = self.cur[m].traj_info.last_kl_step / \

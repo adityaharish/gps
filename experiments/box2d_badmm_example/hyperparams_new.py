@@ -22,14 +22,6 @@ from gps.gui.config import generate_experiment_info
 from gps.proto.gps_pb2 import JOINT_ANGLES, JOINT_VELOCITIES, END_EFFECTOR_POINTS, ACTION
 from gps.utility.make_angular_x0_set import MakeAngularX0Set
 
-# SENSOR_DIMS = {
-#     JOINT_ANGLES: 2,
-#     JOINT_VELOCITIES: 2,
-#     END_EFFECTOR_POINTS: 3,
-#     ACTION: 2
-# }
-
-
 SENSOR_DIMS = {
     'FULL_STATE': 2,
     ACTION: 1,
@@ -46,7 +38,7 @@ common = {
     'data_files_dir': EXP_DIR + 'data_files/',
     'log_filename': EXP_DIR + 'log.txt',
     'conditions': 2,
-    'iterations': 3,
+    'iterations': 3
 }
 
 if not os.path.exists(common['data_files_dir']):
@@ -54,7 +46,7 @@ if not os.path.exists(common['data_files_dir']):
 
 maxvel = 2
 
-number_of_samples = 3
+number_of_samples = 5
 
 ###### INITIAL STATES ######
 x0s = MakeAngularX0Set(common['conditions'],SENSOR_DIMS[ACTION],maxvel)
@@ -69,9 +61,10 @@ agent = {
     'x0': x0s,
     'rk': 0,
     'dt': 0.05,
-    'substeps': 1,
     'render': False,
+    'substeps': 1,
     'conditions': common['conditions'],
+    'reset_conditions': x0s,
     'pos_body_idx': np.array([]),
     'pos_body_offset': np.array([]),
     'T': 100,
@@ -80,10 +73,11 @@ agent = {
     'obs_include': ['FULL_STATE'],
 }
 
+
 algorithm = {
     'type': AlgorithmBADMM,
     'conditions': common['conditions'],
-    'iterations': common['iterations'],
+    'iterations': 3,
     'lg_step_schedule': np.array([1e-4, 1e-3, 1e-2, 1e-2]),
     'policy_dual_rate': 0.2,
     'ent_reg_schedule': np.array([1e-3, 1e-3, 1e-2, 1e-1]),
@@ -115,7 +109,7 @@ state_cost = {
     'data_types' : {
         'FULL_STATE': {
             'wp': np.array([1, 1]),
-            'target_state': agent["target_state"],
+            'target_state': xtarg,
         },
     },
 }
@@ -144,6 +138,14 @@ algorithm['traj_opt'] = {
 algorithm['policy_opt'] = {
     'type': PolicyOptCaffe,
     'weights_file_prefix': EXP_DIR + 'policy',
+    # DEFAULTS:             3,None,27,7,25,TRAIN)
+    'network_arch_params': {
+        'n_layers':2, # last layer has dim dim_output (appended)
+        'dim_hidden':[14], # one entry fewer than n_layers
+        'dim_input':SENSOR_DIMS['FULL_STATE'],
+        'dim_output':SENSOR_DIMS[ACTION],
+        'batch_size':25,
+    },
 }
 
 algorithm['policy_prior'] = {
@@ -154,7 +156,7 @@ algorithm['policy_prior'] = {
 }
 
 config = {
-    'iterations': common['iterations'],
+    'iterations': algorithm['iterations'],
     'num_samples': number_of_samples,
     'verbose_trials': 5,
     'verbose_policy_trials': 0,

@@ -87,14 +87,14 @@ class AlgorithmTrajOpt(Algorithm):
                 np.sum(new_actual_laplace_obj)
 
         # Print improvement details.
-        LOGGER.debug('Previous cost: Laplace: %f MC: %f',
-                     np.sum(previous_laplace_obj), previous_mc_obj)
-        LOGGER.debug('Predicted new cost: Laplace: %f MC: %f',
-                     np.sum(new_predicted_laplace_obj), new_mc_obj)
-        LOGGER.debug('Actual new cost: Laplace: %f MC: %f',
-                     np.sum(new_actual_laplace_obj), new_mc_obj)
-        LOGGER.debug('Predicted/actual improvement: %f / %f',
-                     predicted_impr, actual_impr)
+        # LOGGER.debug('Previous cost: Laplace: %f MC: %f',
+        #              np.sum(previous_laplace_obj), previous_mc_obj)
+        # LOGGER.debug('Predicted new cost: Laplace: %f MC: %f',
+        #              np.sum(new_predicted_laplace_obj), new_mc_obj)
+        # LOGGER.debug('Actual new cost: Laplace: %f MC: %f',
+        #              np.sum(new_actual_laplace_obj), new_mc_obj)
+        # LOGGER.debug('Predicted/actual improvement: %f / %f',
+        #              predicted_impr, actual_impr)
 
         self._set_new_mult(predicted_impr, actual_impr, m)
 

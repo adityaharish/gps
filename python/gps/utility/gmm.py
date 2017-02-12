@@ -124,12 +124,12 @@ class GMM(object):
         N = data.shape[0]
         Do = data.shape[1]
 
-        LOGGER.debug('Fitting GMM with %d clusters on %d points', K, N)
+        ## LOGGER.debug('Fitting GMM with %d clusters on %d points', K, N)#
 
         if (not self.warmstart or self.sigma is None or
                 K != self.sigma.shape[0]):
             # Initialization.
-            LOGGER.debug('Initializing GMM.')
+            ## LOGGER.debug('Initializing GMM.')
             self.sigma = np.zeros((K, Do, Do))
             self.mu = np.zeros((K, Do))
             self.logmass = np.log(1.0 / K) * np.ones((K, 1))
@@ -159,16 +159,16 @@ class GMM(object):
 
             # Compute log-likelihood.
             ll = np.sum(logsum(logobs, axis=1))
-            LOGGER.debug('GMM itr %d/%d. Log likelihood: %f',
-                         itr, max_iterations, ll)
+            #LOGGER.debug('GMM itr %d/%d. Log likelihood: %f',
+            #             itr, max_iterations, ll)
             if ll < prevll:
                 # TODO: Why does log-likelihood decrease sometimes?
                 LOGGER.debug('Log-likelihood decreased! Ending on itr=%d/%d',
                              itr, max_iterations)
                 break
             if np.abs(ll-prevll) < 1e-5*prevll:
-                LOGGER.debug('GMM converged on itr=%d/%d',
-                             itr, max_iterations)
+                #LOGGER.debug('GMM converged on itr=%d/%d',
+                #             itr, max_iterations)
                 break
             prevll = ll
 

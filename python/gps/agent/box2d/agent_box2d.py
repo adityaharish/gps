@@ -7,7 +7,7 @@ from gps.agent.config import AGENT_BOX2D
 from gps.proto.gps_pb2 import ACTION
 from gps.sample.sample import Sample
 
-
+import os
 
 class AgentBox2D(Agent):
     """
@@ -76,6 +76,8 @@ class AgentBox2D(Agent):
         new_sample.set(ACTION, U)
         if save:
             self._samples[condition].append(new_sample)
+        if "CaffePolicy" in str(type(policy)):
+            print 'POLICY',type(policy), os.path.realpath(__file__),' NEW SAMPLE', new_sample.get_U()
         return new_sample
 
     def _init_sample(self, b2d_X):

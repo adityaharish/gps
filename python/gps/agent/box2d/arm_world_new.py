@@ -15,69 +15,101 @@ class ArmWorld(Framework):
         else:
             self.world = b2.b2World(gravity=(0, -10), doSleep=True)
 
-        # self.world.gravity = (0.0, -9.18)
-        self.world.gravity = (0.0, 0.0)
+        # self.world.gravity = (0.0, 0.0)
+        # For pendulum testing
+        self.world.gravity = (0.0, -9.81)
 
         fixture_length = 5
-        self.fixture_length = 5
         self.x0 = x0
-        
+
+        rectangle_fixture = b2.b2FixtureDef(
+            shape=b2.b2PolygonShape(box=(.5, fixture_length)),
+            density=.5,
+            friction=1,
+        )
         square_fixture = b2.b2FixtureDef(
             shape=b2.b2PolygonShape(box=(1, 1)),
             density=100.0,
-            #friction=1,
+            friction=1,
         )
-
-        self.x_base = 0
-        self.y_base = 15
         self.base = self.world.CreateBody(
-            position=(self.x_base, self.y_base),
+            position=(0, 15),
             fixtures=square_fixture,
         )
 
-        blob_fixture = b2.b2FixtureDef(
-            shape=b2.b2CircleShape(radius=1.5),
-            density=1#/(np.pi*2.25),
-        )
-
         self.body1 = self.world.CreateDynamicBody(
-            fixtures = blob_fixture,
-            position = (0, 0),
-            #position = (self.x_base + self.fixture_length * np.sin(x0[0]),  self.y_base + -1 * self.fixture_length * np.cos(x0[0])),
-            angle=x0[0],
+            position=(0, 2),
+            fixtures=rectangle_fixture,
+            angle=b2.b2_pi,
         )
-        
-        _angle = target[0]
+
+        # self.body2 = self.world.CreateDynamicBody(
+        #     fixtures=rectangle_fixture,
+        #     position=(0, 2),
+        #     angle=b2.b2_pi,
+        # )
+
         self.target1 = self.world.CreateDynamicBody(
-            fixtures=blob_fixture,
-            position = (self.x_base + (self.fixture_length * np.sin(_angle)), self.y_base - (self.fixture_length * np.cos(_angle))),
-            angle=_angle,
+            fixtures=rectangle_fixture,
+            position=(0, 0),
+            angle=b2.b2_pi,
         )
+        # self.target2 = self.world.CreateDynamicBody(
+        #     fixtures=rectangle_fixture,
+        #     position=(0, 0),
+        #     angle=b2.b2_pi,
+        # )
 
-        self.set_joint_angles(self.body1, x0[0], x0[1])
-        self.set_joint_angles(self.target1, target[0], target[1])
-
-        _angle = x0[0]
         self.joint1 = self.world.CreateRevoluteJoint(
             bodyA=self.base,
             bodyB=self.body1,
-            localAnchorA=(self.x_base, self.y_base),
-            localAnchorB=(self.x_base + (self.fixture_length * np.sin(_angle)), self.y_base - (self.fixture_length * np.cos(_angle))),
+            localAnchorA=(0, 0),
+            localAnchorB=(0, fixture_length),
             enableMotor=True,
-            maxMotorTorque=25,            
-            enableLimit=True,
+            maxMotorTorque=400,
+            enableLimit=False,
         )
 
-        self.target1.active = False
-        self.joint1.motorSpeed = 0#x0[1]
+        # self.joint2 = self.world.CreateRevoluteJoint(
+        #     bodyA=self.body1,
+        #     bodyB=self.body2,
+        #     localAnchorA=(0, -(fixture_length - 0.5)),
+        #     localAnchorB=(0, fixture_length - 0.5),
+        #     enableMotor=True,
+        #     maxMotorTorque=400,
+        #     enableLimit=False,
+        # )
 
-    def set_joint_angles(self, body, angle, speed):
+        # self.set_joint_angles(self.body1, self.body2, x0[0], x0[1])
+        # self.set_joint_angles(self.target1, self.target2, target[0], target[1])
+
+        self.set_joint_angles(self.body1, x0[0])
+        self.set_joint_angles(self.target1, target[0])
+
+        self.target1.active = False
+        # self.target2.active = False
+
+        self.joint1.motorSpeed = x0[1]
+        # self.joint2.motorSpeed = x0[3]
+
+    def set_joint_angles(self, body1, body2, angle1, angle2):
         """ Converts the given absolute angle of the arms to joint angles"""
-        #pos = self.base.GetWorldPoint((0, 0))
-        body.angle = angle
-        body.speed = speed
-        # new_pos = body.GetWorldPoint((0, self.fixture_length))
-        body.position = (self.x_base + (self.fixture_length * np.sin(angle)), self.y_base - (self.fixture_length * np.cos(angle)))
+        pos = self.base.GetWorldPoint((0, 0))
+        body1.angle = angle1 + np.pi
+        new_pos = body1.GetWorldPoint((0, 5))
+        body1.position += pos - new_pos
+        body2.angle = angle2 + body1.angle
+        pos = body1.GetWorldPoint((0, -4.5))
+        new_pos = body2.GetWorldPoint((0, 4.5))
+        body2.position += pos - new_pos
+
+    def set_joint_angles(self, body1, angle1):
+        """ Converts the given absolute angle of the arms to joint angles"""
+        pos = self.base.GetWorldPoint((0, 0))
+        body1.angle = angle1 + np.pi
+        new_pos = body1.GetWorldPoint((0, 5))
+        body1.position += pos - new_pos
+        pos = body1.GetWorldPoint((0, -4.5))        
 
     def run(self):
         """Initiates the first time step
@@ -108,14 +140,14 @@ class ArmWorld(Framework):
     def reset_world(self):
         """Returns the world to its intial state"""
         self.world.ClearForces()
-        self.joint1.motorSpeed = self.x0[1]
+        self.joint1.motorSpeed = 0
         # self.joint2.motorSpeed = 0
         self.body1.linearVelocity = (0, 0)
         self.body1.angularVelocity = 0
         # self.body2.linearVelocity = (0, 0)
         # self.body2.angularVelocity = 0
-        self.set_joint_angles(self.body1, self.x0[0], self.x0[1])
-
+        # self.set_joint_angles(self.body1, self.body2, self.x0[0], self.x0[1])
+        self.set_joint_angles(self.body1, self.x0[0])
 
     def get_state(self):
         """Retrieves the state of the point mass"""
@@ -125,5 +157,6 @@ class ArmWorld(Framework):
         #                                      self.joint2.speed]),
         #          END_EFFECTOR_POINTS: np.append(np.array(self.body2.position),[0])}
         state = { 'FULL_STATE': np.array([self.joint1.angle, self.joint1.speed])}
+
         return state
 
